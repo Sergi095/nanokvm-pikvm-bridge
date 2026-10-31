@@ -1,0 +1,57 @@
+#!/bin/sh
+# Optional Buildroot/BusyBox service for the NanoKVM TouchKVM/VNC bridge.
+DAEMON=/root/nanokvm-pikvm-bridge.py
+PIDFILE=/var/run/nanokvm-touch.pid
+LOGFILE=/tmp/nanokvm-touch.log
+umask 077
+UPSTREAM=https://127.0.0.1
+CERT=/etc/kvm/server.crt
+KEY=/etc/kvm/server.key
+PORT=8443
+VNC_PORT=5900
+VNC_FPS=20
+# Optional root-owned settings; no login credentials belong in this file.
+if [ -r /etc/default/nanokvm-touch ]; then . /etc/default/nanokvm-touch; fi
+
+running() {
+    [ -r "$PIDFILE" ] || return 1
+    read -r pid < "$PIDFILE"
+    case "$pid" in ''|*[!0-9]*) return 1 ;; esac
+    [ -r "/proc/$pid/cmdline" ] || return 1
+    tr '\000' '\n' < "/proc/$pid/cmdline" | grep -Fxq "$DAEMON"
+}
+
+case "$1" in
+    start)
+        if running; then echo 'NanoKVM TouchKVM bridge is already running'; exit 0; fi
+        [ -f "$DAEMON" ] || exit 1
+        : > "$LOGFILE"
+        # Credentials are supplied by the phone app at login.
+        start-stop-daemon -S -b -m -p "$PIDFILE" -x /bin/sh -- -c \
+            'exec /usr/bin/python3 "$@" >> /tmp/nanokvm-touch.log 2>&1' sh \
+            "$DAEMON" --upstream "$UPSTREAM" --cert "$CERT" --key "$KEY" \
+            --port "$PORT" --vnc-port "$VNC_PORT" --vnc-fps "$VNC_FPS"
+        sleep 1
+        if running; then echo "NanoKVM bridge started: HTTPS $PORT, VNC $VNC_PORT (0 = disabled)"; else cat "$LOGFILE"; exit 1; fi
+        ;;
+    stop)
+        if running; then
+            kill -TERM "$pid"
+            count=0
+            while running && [ "$count" -lt 10 ]; do sleep 1; count=$((count + 1)); done
+            if running; then echo 'Bridge is still stopping'; exit 1; fi
+        fi
+        rm -f "$PIDFILE"
+        echo 'NanoKVM TouchKVM bridge stopped'
+        ;;
+    restart)
+        "$0" stop && "$0" start
+        ;;
+    status)
+        if running; then echo 'NanoKVM TouchKVM bridge is running'; else echo 'NanoKVM TouchKVM bridge is stopped'; exit 1; fi
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart|status}"
+        exit 1
+        ;;
+esac
