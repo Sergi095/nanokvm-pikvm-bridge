@@ -281,13 +281,13 @@ mouse delivery were verified against the test backend. Live PiKVM API checks
 verified authentication, metadata, JPEG video and the idle input WebSocket.
 TouchKVM app compatibility remains unverified.
 
-## License
-
-MIT. Original translation-layer code; no PiKVM, NanoKVM or phone-app implementation
-code is vendored. This is an independent community project, not affiliated with
-or endorsed by Sipeed, PiKVM, TouchKVM or bVNC.
+## References
 
 Protocol references: [PiKVM API](https://docs.pikvm.org/api/),
 [KVMD](https://github.com/pikvm/kvmd),
 [NanoKVM](https://github.com/sipeed/NanoKVM/tree/2.5.2), and
 [the RFB specification](https://github.com/rfbproto/rfbproto).
+
+## License
+
+Open to use under the [MIT License](LICENSE).
