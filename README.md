@@ -1,8 +1,9 @@
-# NanoKVM phone app bridge
+# Sipeed NanoKVM phone app bridge
 
-**Goal: make NanoKVM work with phone apps—specifically TouchKVM and bVNC.**
+**Goal: make the Sipeed NanoKVM work with phone apps—specifically TouchKVM and bVNC.**
 
-This single Python script runs on an original NanoKVM and translates the protocols
+This single Python script runs on an original [NanoKVM by Sipeed](https://github.com/sipeed/NanoKVM)
+and translates the protocols
 those apps understand into NanoKVM's existing video, keyboard, mouse and power APIs.
 You can access the attached computer's HDMI output and USB input, including its
 BIOS and boot screens, without installing software on that computer.
@@ -283,7 +284,8 @@ TouchKVM app compatibility remains unverified.
 ## License
 
 MIT. Original translation-layer code; no PiKVM, NanoKVM or phone-app implementation
-code is vendored. This project is independent of those products.
+code is vendored. This is an independent community project, not affiliated with
+or endorsed by Sipeed, PiKVM, TouchKVM or bVNC.
 
 Protocol references: [PiKVM API](https://docs.pikvm.org/api/),
 [KVMD](https://github.com/pikvm/kvmd),
